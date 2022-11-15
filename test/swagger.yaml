@@ -1,0 +1,335 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "Foto Portfolio Project",
+    "description" : "do uzupełnienia\n",
+    "contact" : {
+      "email" : "mateusz.teplicki@gmail.com"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version" : "1.0.0"
+  },
+  "externalDocs" : {
+    "description" : "Find out more about Swagger",
+    "url" : "http://swagger.io"
+  },
+  "servers" : [ {
+    "url" : "https://virtserver.swaggerhub.com/MATEUSZTEPLICKI/foto_portfolio_project/1.0.0",
+    "description" : "SwaggerHub API Auto Mocking"
+  }, {
+    "url" : "https://127.0.0.1:8080"
+  } ],
+  "tags" : [ {
+    "name" : "page",
+    "description" : "\\\\\\\\TODO"
+  }, {
+    "name" : "subpage",
+    "description" : "\\\\\\\\TODO"
+  }, {
+    "name" : "layout",
+    "description" : "\\\\\\\\TODO"
+  }, {
+    "name" : "social",
+    "description" : "\\\\\\\\TODO"
+  }, {
+    "name" : "section",
+    "description" : "\\\\\\\\TODO"
+  }, {
+    "name" : "image",
+    "description" : "\\\\\\\\TODO"
+  } ],
+  "paths" : {
+    "/page" : {
+      "get" : {
+        "tags" : [ "page" ],
+        "summary" : "\\\\\\\\TODO",
+        "description" : "\\\\\\TODO",
+        "operationId" : "getPage",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "\\\\\\\\TODO",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Page"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid ID"
+          },
+          "404" : {
+            "description" : "Page not found"
+          }
+        }
+      }
+    },
+    "/image/{id}" : {
+      "get" : {
+        "description" : "\\\\\\\\TODO",
+        "operationId" : "putImage"
+      },
+      "post" : {
+        "tags" : [ "image" ],
+        "summary" : "\\\\\\\\TODO",
+        "description" : "\\\\\\\\TODO",
+        "operationId" : "putImage",
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/image_id_body"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Image"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Section" : {
+        "required" : [ "alias", "id", "required", "subpage" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 1
+          },
+          "subpage" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 5
+          },
+          "alias" : {
+            "type" : "string",
+            "example" : "gallery_section"
+          },
+          "images" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Image"
+            }
+          },
+          "value" : {
+            "type" : "object",
+            "additionalProperties" : { },
+            "example" : {
+              "images" : [ {
+                "image" : "https://i.ibb.co/R3JhM0J/Group-1-min.jpg",
+                "alt" : "Alternative text",
+                "title" : "Title of image"
+              }, {
+                "image" : "https://i.ibb.co/VDnKX0R/Group-3-min.jpg",
+                "alt" : "Title of image",
+                "title" : "Title of image"
+              } ]
+            }
+          }
+        }
+      },
+      "Subpage" : {
+        "required" : [ "id", "page" ],
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 1
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 10
+          },
+          "name" : {
+            "type" : "string",
+            "example" : "About"
+          },
+          "path" : {
+            "type" : "string",
+            "example" : "/about"
+          },
+          "title" : {
+            "type" : "string",
+            "example" : "About"
+          },
+          "description" : {
+            "type" : "string",
+            "example" : "About description"
+          },
+          "sections" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Section"
+            }
+          },
+          "value" : {
+            "type" : "object",
+            "additionalProperties" : { }
+          }
+        }
+      },
+      "Social" : {
+        "required" : [ "alias", "id", "page" ],
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 1
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 10
+          },
+          "alias" : {
+            "type" : "string",
+            "example" : "Google Photos"
+          },
+          "value" : {
+            "type" : "object",
+            "additionalProperties" : { }
+          }
+        }
+      },
+      "Page" : {
+        "required" : [ "id" ],
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 1
+          }
+        }
+      },
+      "Layout" : {
+        "required" : [ "id" ],
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 1
+          }
+        }
+      },
+      "Image" : {
+        "required" : [ "id" ],
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 1
+          }
+        }
+      },
+      "image_id_body" : {
+        "type" : "object",
+        "properties" : {
+          "file" : {
+            "type" : "string",
+            "format" : "binary"
+          },
+          "page_id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 1
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "Photo" : {
+        "content" : {
+          "multipart/form-data" : {
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "file" : {
+                  "type" : "string",
+                  "format" : "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Pet" : {
+        "description" : "Pet object that needs to be added to the store",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Section"
+            }
+          },
+          "application/xml" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Section"
+            }
+          }
+        },
+        "required" : true
+      },
+      "UserArray" : {
+        "description" : "List of user object",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/components/schemas/Section"
+              }
+            }
+          }
+        },
+        "required" : true
+      }
+    },
+    "securitySchemes" : {
+      "petstore_auth" : {
+        "type" : "oauth2",
+        "flows" : {
+          "implicit" : {
+            "authorizationUrl" : "http://petstore.swagger.io/oauth/dialog",
+            "scopes" : {
+              "write:pets" : "modify pets in your account",
+              "read:pets" : "read your pets"
+            }
+          }
+        }
+      },
+      "api_key" : {
+        "type" : "apiKey",
+        "name" : "api_key",
+        "in" : "header"
+      }
+    }
+  }
+}
