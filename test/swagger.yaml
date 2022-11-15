@@ -79,10 +79,40 @@
         }
       }
     },
-    "/image/{id}" : {
+    "/image" : {
       "get" : {
+        "summary" : "\\\\\\\\TODO",
         "description" : "\\\\\\\\TODO",
-        "operationId" : "putImage"
+        "operationId" : "getImage",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "\\\\\\\\TODO",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Image"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "invalid ID"
+          },
+          "404" : {
+            "description" : "page not found"
+          }
+        }
       },
       "post" : {
         "tags" : [ "image" ],
@@ -93,7 +123,7 @@
           "content" : {
             "multipart/form-data" : {
               "schema" : {
-                "$ref" : "#/components/schemas/image_id_body"
+                "$ref" : "#/components/schemas/image_body"
               }
             }
           }
@@ -108,6 +138,61 @@
                 }
               }
             }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "\\\\\\\\TODO",
+        "description" : "\\\\\\\\TODO",
+        "operationId" : "deleteImage",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "query",
+          "description" : "\\\\\\\\TODO",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation"
+          },
+          "400" : {
+            "description" : "invalid ID"
+          },
+          "404" : {
+            "description" : "page not found"
+          }
+        }
+      }
+    },
+    "/image/array" : {
+      "get" : {
+        "summary" : "\\\\\\\\TODO",
+        "description" : "\\\\\\\\TODO",
+        "operationId" : "getImageArray",
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Image"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "invalid ID"
+          },
+          "404" : {
+            "description" : "page not found"
           }
         }
       }
@@ -250,7 +335,7 @@
           }
         }
       },
-      "image_id_body" : {
+      "image_body" : {
         "type" : "object",
         "properties" : {
           "file" : {
