@@ -32,14 +32,15 @@
     "name" : "layout",
     "description" : "\\\\\\\\TODO"
   }, {
-    "name" : "social",
-    "description" : "\\\\\\\\TODO"
+    "name" : "social"
   }, {
     "name" : "section",
     "description" : "\\\\\\\\TODO"
   }, {
-    "name" : "image",
-    "description" : "\\\\\\\\TODO"
+    "name" : "image"
+  }, {
+    "name" : "user",
+    "description" : "mechanizm autentyfikacji i tworzenia nowych użytkowników (np POST /user tworzy nową stronę)"
   } ],
   "paths" : {
     "/page" : {
@@ -81,6 +82,7 @@
     },
     "/image" : {
       "get" : {
+        "tags" : [ "image" ],
         "summary" : "\\\\\\\\TODO",
         "description" : "\\\\\\\\TODO",
         "operationId" : "getImage",
@@ -142,6 +144,7 @@
         }
       },
       "delete" : {
+        "tags" : [ "image" ],
         "summary" : "\\\\\\\\TODO",
         "description" : "\\\\\\\\TODO",
         "operationId" : "deleteImage",
@@ -171,6 +174,7 @@
     },
     "/image/array" : {
       "get" : {
+        "tags" : [ "image" ],
         "summary" : "\\\\\\\\TODO",
         "description" : "\\\\\\\\TODO",
         "operationId" : "getImageArray",
@@ -218,31 +222,13 @@
             "type" : "string",
             "example" : "gallery_section"
           },
-          "images" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/Image"
-            }
-          },
           "value" : {
-            "type" : "object",
-            "additionalProperties" : { },
-            "example" : {
-              "images" : [ {
-                "image" : "https://i.ibb.co/R3JhM0J/Group-1-min.jpg",
-                "alt" : "Alternative text",
-                "title" : "Title of image"
-              }, {
-                "image" : "https://i.ibb.co/VDnKX0R/Group-3-min.jpg",
-                "alt" : "Title of image",
-                "title" : "Title of image"
-              } ]
-            }
+            "$ref" : "#/components/schemas/Section_value"
           }
         }
       },
       "Subpage" : {
-        "required" : [ "id", "page" ],
+        "required" : [ "id", "meta", "page", "sections" ],
         "properties" : {
           "id" : {
             "type" : "integer",
@@ -254,6 +240,16 @@
             "format" : "int64",
             "example" : 10
           },
+          "meta" : {
+            "$ref" : "#/components/schemas/MetaSubpage"
+          },
+          "value" : {
+            "$ref" : "#/components/schemas/Subpage_value"
+          }
+        }
+      },
+      "MetaSubpage" : {
+        "properties" : {
           "name" : {
             "type" : "string",
             "example" : "About"
@@ -269,16 +265,6 @@
           "description" : {
             "type" : "string",
             "example" : "About description"
-          },
-          "sections" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/Section"
-            }
-          },
-          "value" : {
-            "type" : "object",
-            "additionalProperties" : { }
           }
         }
       },
@@ -306,12 +292,40 @@
         }
       },
       "Page" : {
-        "required" : [ "id" ],
+        "required" : [ "id", "layout", "meta", "subpages" ],
         "properties" : {
           "id" : {
             "type" : "integer",
             "format" : "int64",
             "example" : 1
+          },
+          "meta" : {
+            "$ref" : "#/components/schemas/MetaPage"
+          },
+          "layout" : {
+            "$ref" : "#/components/schemas/Layout"
+          },
+          "subpages" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Subpage"
+            }
+          }
+        }
+      },
+      "MetaPage" : {
+        "properties" : {
+          "domain" : {
+            "type" : "string",
+            "example" : "mateuszteplicki.myportfolio.com"
+          },
+          "name" : {
+            "type" : "string",
+            "example" : "mateusz teplicki fotografia"
+          },
+          "author" : {
+            "type" : "string",
+            "example" : "mateusz teplicki"
           }
         }
       },
@@ -322,6 +336,29 @@
             "type" : "integer",
             "format" : "int64",
             "example" : 1
+          },
+          "is_template" : {
+            "type" : "boolean",
+            "example" : false
+          },
+          "author" : {
+            "type" : "string"
+          },
+          "alias" : {
+            "type" : "string"
+          },
+          "font" : {
+            "type" : "string"
+          },
+          "nav_bar" : {
+            "type" : "string",
+            "enum" : [ "left", "top", "right" ]
+          },
+          "logo" : {
+            "$ref" : "#/components/schemas/Image"
+          },
+          "background_color" : {
+            "type" : "string"
           }
         }
       },
@@ -332,6 +369,20 @@
             "type" : "integer",
             "format" : "int64",
             "example" : 1
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int64",
+            "example" : 2
+          },
+          "image" : {
+            "type" : "string"
+          },
+          "alt" : {
+            "type" : "string"
+          },
+          "title" : {
+            "type" : "string"
           }
         }
       },
@@ -346,6 +397,30 @@
             "type" : "integer",
             "format" : "int64",
             "example" : 1
+          }
+        }
+      },
+      "Section_value" : {
+        "type" : "object",
+        "properties" : {
+          "images" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Image"
+            }
+          }
+        },
+        "example" : "{\"images\":[{\"id\":1,\"page\":2,\"image\":\"https://i.ibb.co/R3JhM0J/Group-1-min.jpg\",\"alt\":\"Alternative text\",\"title\":\"Title of image\"},{\"id\":2,\"page\":2,\"image\":\"https://i.ibb.co/VDnKX0R/Group-3-min.jpg\",\"alt\":\"Title of image\",\"title\":\"Title of image\"}]}"
+      },
+      "Subpage_value" : {
+        "required" : [ "sections" ],
+        "type" : "object",
+        "properties" : {
+          "sections" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Section"
+            }
           }
         }
       }
@@ -398,22 +473,10 @@
       }
     },
     "securitySchemes" : {
-      "petstore_auth" : {
-        "type" : "oauth2",
-        "flows" : {
-          "implicit" : {
-            "authorizationUrl" : "http://petstore.swagger.io/oauth/dialog",
-            "scopes" : {
-              "write:pets" : "modify pets in your account",
-              "read:pets" : "read your pets"
-            }
-          }
-        }
-      },
-      "api_key" : {
-        "type" : "apiKey",
-        "name" : "api_key",
-        "in" : "header"
+      "bearerAuth" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
       }
     }
   }
