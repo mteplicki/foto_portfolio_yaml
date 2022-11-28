@@ -2,7 +2,7 @@
   "openapi" : "3.0.0",
   "info" : {
     "title" : "Foto Portfolio Project",
-    "description" : "do uzupełnienia\n",
+    "description" : "Plik openapi definiujący RESTowe zapytania aplikacji do szybkiego tworzenia portfolio dla fotografów\n",
     "contact" : {
       "email" : "mateusz.teplicki@gmail.com"
     },
@@ -12,10 +12,6 @@
     },
     "version" : "1.0.0"
   },
-  "externalDocs" : {
-    "description" : "Find out more about Swagger",
-    "url" : "http://swagger.io"
-  },
   "servers" : [ {
     "url" : "https://virtserver.swaggerhub.com/MATEUSZTEPLICKI/foto_portfolio_project/1.0.0",
     "description" : "SwaggerHub API Auto Mocking"
@@ -24,38 +20,124 @@
   } ],
   "tags" : [ {
     "name" : "page",
-    "description" : "\\\\\\\\TODO"
+    "description" : "creates/returns/updates contents of pages"
   }, {
     "name" : "subpage",
-    "description" : "\\\\\\\\TODO"
+    "description" : "creates/returns/updates/deletes contents of subpages"
   }, {
     "name" : "layout",
-    "description" : "\\\\\\\\TODO"
+    "description" : "actions dealing with layouts"
   }, {
-    "name" : "social"
+    "name" : "social",
+    "description" : "actions dealing with social medias"
   }, {
     "name" : "section",
-    "description" : "\\\\\\\\TODO"
+    "description" : "creates/returns/updates/deletes contents of sections"
   }, {
-    "name" : "image"
+    "name" : "image",
+    "description" : "creates/returns/deletes images"
   }, {
-    "name" : "user",
-    "description" : "mechanizm autentyfikacji i tworzenia nowych użytkowników (np POST /user tworzy nową stronę)"
+    "name" : "session",
+    "description" : "mechanizm autentyfikacji (zwracanie tokenu JWT)"
   } ],
   "paths" : {
+    "/session" : {
+      "get" : {
+        "tags" : [ "session" ],
+        "summary" : "login to admin panel",
+        "description" : "if login and password are correct, returns a JWT token to authorize REST api",
+        "operationId" : "getSession",
+        "parameters" : [ {
+          "name" : "Login",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Pasword",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation -  returns JWT token with id of page as payload (więc nie ma potrzeby przesyłania go poprzez restowe zapytania, gdyż w tym tokenie bedzie informacja, na jakiej stronie działamy)",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "wrong login or password"
+          }
+        }
+      }
+    },
     "/page" : {
+      "post" : {
+        "tags" : [ "page" ],
+        "summary" : "creates a new page",
+        "description" : "creates a blank project with one blank subpage - requires creating new account (user must provide login and password)",
+        "operationId" : "createPage",
+        "parameters" : [ {
+          "name" : "Login",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Pasword",
+          "in" : "header",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation - returns blank project",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Page"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "page (Login) already exists"
+          }
+        }
+      }
+    },
+    "/page/{id}" : {
       "get" : {
         "tags" : [ "page" ],
-        "summary" : "\\\\\\\\TODO",
-        "description" : "\\\\\\TODO",
+        "summary" : "returns the requested page",
+        "description" : "returns page that user/admin sent request for",
         "operationId" : "getPage",
         "parameters" : [ {
           "name" : "id",
-          "in" : "query",
-          "description" : "\\\\\\\\TODO",
+          "in" : "path",
+          "description" : "id of page",
           "required" : true,
-          "style" : "form",
-          "explode" : true,
+          "style" : "simple",
+          "explode" : false,
           "schema" : {
             "type" : "integer"
           }
@@ -71,28 +153,1051 @@
               }
             }
           },
-          "400" : {
-            "description" : "Invalid ID"
-          },
           "404" : {
             "description" : "Page not found"
           }
         }
       }
     },
-    "/image" : {
+    "/page/meta" : {
+      "patch" : {
+        "tags" : [ "page" ],
+        "summary" : "modifies a metadata of a page",
+        "operationId" : "patchMetaPage",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/MetaPage"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation - returns metapage",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MetaPage"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/subpage" : {
       "get" : {
-        "tags" : [ "image" ],
-        "summary" : "\\\\\\\\TODO",
-        "description" : "\\\\\\\\TODO",
-        "operationId" : "getImage",
+        "tags" : [ "subpage" ],
+        "summary" : "returns array of subpages",
+        "operationId" : "getSubpageArray",
+        "responses" : {
+          "200" : {
+            "description" : "succesfuly created - returns an array",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Subpage"
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "subpage" ],
+        "summary" : "creates a new subpage",
+        "description" : "creates a new subpage based on MetaPage",
+        "operationId" : "createSubpage",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/subpage_body"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "succesfuly created - returns a subpage",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Subpage"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "subpage" ],
+        "summary" : "modifies the order of subpages in array",
+        "operationId" : "patchSubpageOrder",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Order"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Subpage"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "provided list of IDs does not contains all of subpages in page"
+          },
+          "404" : {
+            "description" : "at least one ID is wrong"
+          },
+          "403" : {
+            "description" : "unauthorised operation - at least one subpage belongs to another page"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/subpage/{id}" : {
+      "get" : {
+        "tags" : [ "subpage" ],
+        "summary" : "find subpage by ID",
+        "description" : "returns a subpage based on ID",
+        "operationId" : "getSubpage",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id of subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation - returns a subpage",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Subpage"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "invalid id"
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "subpage" ],
+        "summary" : "deletes a subpage",
+        "operationId" : "deleteSubpage",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id of subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation"
+          },
+          "404" : {
+            "description" : "invalid id"
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "subpage" ],
+        "summary" : "updates a subpage",
+        "operationId" : "patchSubpage",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id of subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/subpage_id_body"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation - returns a subpage",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Subpage"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "invalid id"
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/layout/template" : {
+      "get" : {
+        "tags" : [ "layout" ],
+        "summary" : "return array of template layouts",
+        "description" : "admin can choose the best layout for page from the existing ones",
+        "operationId" : "getTemplateArray",
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Layout"
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "put" : {
+        "tags" : [ "layout" ],
+        "summary" : "creates new layout based on template layout",
+        "description" : "creates new layout based on template layout, and assign it to a page (old template is removed)",
+        "operationId" : "putTemplateBasedLayout",
         "parameters" : [ {
           "name" : "id",
           "in" : "query",
-          "description" : "\\\\\\\\TODO",
+          "description" : "ID of template layout",
           "required" : true,
           "style" : "form",
           "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        }, {
+          "name" : "alias",
+          "in" : "query",
+          "description" : "alias of a layout",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Layout"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "wrong id"
+          },
+          "403" : {
+            "description" : "unauthorised operation - not a template"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/layout" : {
+      "get" : {
+        "tags" : [ "layout" ],
+        "summary" : "returns a layout assigned to a page",
+        "operationId" : "getLayout",
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Layout"
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "put" : {
+        "tags" : [ "layout" ],
+        "summary" : "creates a new layout",
+        "description" : "creates a new layout based on alias and value (old layout is deleted)",
+        "operationId" : "putLayout",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/MetaLayout"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Layout"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "layout" ],
+        "summary" : "updates a layout",
+        "operationId" : "patchLayout",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/MetaLayout"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Layout"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/social" : {
+      "get" : {
+        "tags" : [ "social" ],
+        "summary" : "returns a array of social bindings",
+        "operationId" : "getSocials",
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Social"
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "social" ],
+        "summary" : "creates a new social media connection",
+        "operationId" : "createConnection",
+        "parameters" : [ {
+          "name" : "alias",
+          "in" : "query",
+          "description" : "alias of a connection",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "value",
+          "in" : "header",
+          "description" : "value of a connection",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "object",
+            "additionalProperties" : true
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Social"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "wrong value of connection"
+          },
+          "403" : {
+            "description" : "authorization error - social binding does not belong to page"
+          },
+          "500" : {
+            "description" : "server error"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/social/{id}" : {
+      "get" : {
+        "tags" : [ "social" ],
+        "summary" : "finds a social by ID",
+        "operationId" : "getSocialByID",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Social"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "wrong ID"
+          },
+          "403" : {
+            "description" : "authorization error - social binding does not belong to page"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "social" ],
+        "summary" : "deletes a social by ID",
+        "operationId" : "deleteSocialByID",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation"
+          },
+          "404" : {
+            "description" : "wrong ID"
+          },
+          "403" : {
+            "description" : "authorization error - social binding does not belong to page"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/subpage/{id_subpage}/section" : {
+      "get" : {
+        "tags" : [ "section" ],
+        "summary" : "returns a array of sections of subpage",
+        "operationId" : "getSections",
+        "parameters" : [ {
+          "name" : "id_subpage",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Section"
+                  }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "wrong ID of subpage"
+          },
+          "403" : {
+            "description" : "authorization error - subpage does not belong to page"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "section" ],
+        "summary" : "creates a new section on a subpage",
+        "operationId" : "createSection",
+        "parameters" : [ {
+          "name" : "id_subpage",
+          "in" : "path",
+          "description" : "path of a subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/id_subpage_section_body"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Section"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "wrong value of section"
+          },
+          "403" : {
+            "description" : "authorization error - subpage does not belong to page"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "section" ],
+        "summary" : "modifies the order of sections in subpage",
+        "operationId" : "patchSectionOrder",
+        "parameters" : [ {
+          "name" : "id_subpage",
+          "in" : "path",
+          "description" : "path of a subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Order"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Section"
+                  }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "at least one ID is wrong"
+          },
+          "403" : {
+            "description" : "unauthorised operation - at least one subpage belongs to another page, or at least one section belongs to another subpage"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/subpage/{id_subpage}/section/{id_section}" : {
+      "get" : {
+        "tags" : [ "section" ],
+        "summary" : "finds a section by ID",
+        "operationId" : "getSectionByID",
+        "parameters" : [ {
+          "name" : "id_subpage",
+          "in" : "path",
+          "description" : "path of a subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        }, {
+          "name" : "id_section",
+          "in" : "path",
+          "description" : "path of a subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Section"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "wrong ID"
+          },
+          "403" : {
+            "description" : "authorization error - subpage does not belong to page or section does not belong to subpage"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "section" ],
+        "summary" : "deletes a section by ID",
+        "operationId" : "deleteSectionByID",
+        "parameters" : [ {
+          "name" : "id_subpage",
+          "in" : "path",
+          "description" : "path of a subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        }, {
+          "name" : "id_section",
+          "in" : "path",
+          "description" : "path of a subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation"
+          },
+          "404" : {
+            "description" : "wrong ID"
+          },
+          "403" : {
+            "description" : "authorization error - social binding does not belong to page"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/subpage/{id_subpage}/section/{id_section}/value" : {
+      "patch" : {
+        "tags" : [ "section" ],
+        "summary" : "modifies a value of section",
+        "description" : "modifies a value of section - new value object does not replace old, but method combines both of them (@see patch method)",
+        "operationId" : "patchSectionValue",
+        "parameters" : [ {
+          "name" : "id_subpage",
+          "in" : "path",
+          "description" : "id of a subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        }, {
+          "name" : "id_section",
+          "in" : "path",
+          "description" : "id of section",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        } ],
+        "requestBody" : {
+          "description" : "value of section",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "additionalProperties" : true
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Section"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "wrong ID"
+          },
+          "403" : {
+            "description" : "authorization error - subpage does not belong to page or section does not belong to subpage"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/subpage/{id_subpage}/section/{id_section}/images" : {
+      "post" : {
+        "tags" : [ "section" ],
+        "summary" : "add one image to a section",
+        "operationId" : "postImageToSection",
+        "parameters" : [ {
+          "name" : "id_subpage",
+          "in" : "path",
+          "description" : "id of a subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        }, {
+          "name" : "id_section",
+          "in" : "path",
+          "description" : "id of section",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        }, {
+          "name" : "value",
+          "in" : "query",
+          "description" : "id of image",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "example" : 7
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Image"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "this section does not allow adding images"
+          },
+          "404" : {
+            "description" : "wrong ID"
+          },
+          "403" : {
+            "description" : "authorization error - subpage does not belong to page or section does not belong to subpage"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "section" ],
+        "summary" : "modifies the order of photos in section or add all photos from ID array to this section",
+        "operationId" : "patchImageOrder",
+        "parameters" : [ {
+          "name" : "id_subpage",
+          "in" : "path",
+          "description" : "id of a subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        }, {
+          "name" : "id_section",
+          "in" : "path",
+          "description" : "id of section",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Order"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Image"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "this section does not allow adding images"
+          },
+          "404" : {
+            "description" : "wrong ID"
+          },
+          "403" : {
+            "description" : "authorization error - subpage does not belong to page or section does not belong to subpage"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/subpage/{id_subpage}/section/{id_section}/images/{id_image}" : {
+      "delete" : {
+        "tags" : [ "section" ],
+        "summary" : "deletes an image from section",
+        "operationId" : "deleteImageFromSection",
+        "parameters" : [ {
+          "name" : "id_subpage",
+          "in" : "path",
+          "description" : "id of a subpage",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        }, {
+          "name" : "id_section",
+          "in" : "path",
+          "description" : "id of section",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        }, {
+          "name" : "id_image",
+          "in" : "path",
+          "description" : "id of image",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "example" : 5
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Image"
+                  }
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "wrong ID"
+          },
+          "403" : {
+            "description" : "authorization error - subpage does not belong to page or section does not belong to subpage"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/image/{id}" : {
+      "get" : {
+        "tags" : [ "image" ],
+        "summary" : "returns specific image",
+        "description" : "returns image requested by admin/user",
+        "operationId" : "getImage",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id of requested image",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
           "schema" : {
             "type" : "integer"
           }
@@ -108,19 +1213,84 @@
               }
             }
           },
-          "400" : {
-            "description" : "invalid ID"
+          "403" : {
+            "description" : "unauthorized operation"
           },
           "404" : {
-            "description" : "page not found"
+            "description" : "invalid ID"
           }
-        }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "image" ],
+        "summary" : "deletes image with specific id",
+        "description" : "admin send request to server with intentions of deleting image with specific id",
+        "operationId" : "deleteImage",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id of deleted image",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation"
+          },
+          "404" : {
+            "description" : "invalid ID"
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
+      }
+    },
+    "/image" : {
+      "get" : {
+        "tags" : [ "image" ],
+        "summary" : "get array of images",
+        "description" : "returns array of images with specified position",
+        "operationId" : "getImageArray",
+        "responses" : {
+          "200" : {
+            "description" : "succesful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Image"
+                  }
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "unauthorized operation"
+          },
+          "404" : {
+            "description" : "invalid ID"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
       },
       "post" : {
         "tags" : [ "image" ],
-        "summary" : "\\\\\\\\TODO",
-        "description" : "\\\\\\\\TODO",
-        "operationId" : "putImage",
+        "summary" : "post an image",
+        "operationId" : "postImage",
         "requestBody" : {
           "content" : {
             "multipart/form-data" : {
@@ -140,72 +1310,21 @@
                 }
               }
             }
-          }
-        }
-      },
-      "delete" : {
-        "tags" : [ "image" ],
-        "summary" : "\\\\\\\\TODO",
-        "description" : "\\\\\\\\TODO",
-        "operationId" : "deleteImage",
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "query",
-          "description" : "\\\\\\\\TODO",
-          "required" : true,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : "integer"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "succesful operation"
           },
-          "400" : {
-            "description" : "invalid ID"
-          },
-          "404" : {
-            "description" : "page not found"
+          "403" : {
+            "description" : "unauthorized operation"
           }
-        }
-      }
-    },
-    "/image/array" : {
-      "get" : {
-        "tags" : [ "image" ],
-        "summary" : "\\\\\\\\TODO",
-        "description" : "\\\\\\\\TODO",
-        "operationId" : "getImageArray",
-        "responses" : {
-          "200" : {
-            "description" : "succesful operation",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/Image"
-                  }
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "invalid ID"
-          },
-          "404" : {
-            "description" : "page not found"
-          }
-        }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ]
       }
     }
   },
   "components" : {
     "schemas" : {
       "Section" : {
-        "required" : [ "alias", "id", "required", "subpage" ],
+        "required" : [ "alias", "id", "subpage", "value" ],
         "type" : "object",
         "properties" : {
           "id" : {
@@ -222,13 +1341,34 @@
             "type" : "string",
             "example" : "gallery_section"
           },
+          "images" : {
+            "type" : "array",
+            "example" : [ {
+              "id" : 1,
+              "page" : 2,
+              "image" : "https://i.ibb.co/R3JhM0J/Group-1-min.jpg",
+              "alt" : "Alternative text",
+              "title" : "Title of image"
+            }, {
+              "id" : 2,
+              "page" : 2,
+              "image" : "https://i.ibb.co/VDnKX0R/Group-3-min.jpg",
+              "alt" : "Title of image",
+              "title" : "Title of image"
+            } ],
+            "items" : {
+              "$ref" : "#/components/schemas/Image"
+            }
+          },
           "value" : {
-            "$ref" : "#/components/schemas/Section_value"
+            "type" : "object",
+            "additionalProperties" : true
           }
         }
       },
       "Subpage" : {
-        "required" : [ "id", "meta", "page", "sections" ],
+        "required" : [ "id", "meta", "page", "sections", "value" ],
+        "type" : "object",
         "properties" : {
           "id" : {
             "type" : "integer",
@@ -243,12 +1383,20 @@
           "meta" : {
             "$ref" : "#/components/schemas/MetaSubpage"
           },
+          "sections" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Section"
+            }
+          },
           "value" : {
-            "$ref" : "#/components/schemas/Subpage_value"
+            "type" : "object",
+            "additionalProperties" : true
           }
         }
       },
       "MetaSubpage" : {
+        "type" : "object",
         "properties" : {
           "name" : {
             "type" : "string",
@@ -266,10 +1414,12 @@
             "type" : "string",
             "example" : "About description"
           }
-        }
+        },
+        "additionalProperties" : true
       },
       "Social" : {
-        "required" : [ "alias", "id", "page" ],
+        "required" : [ "alias", "id", "page", "value" ],
+        "type" : "object",
         "properties" : {
           "id" : {
             "type" : "integer",
@@ -287,12 +1437,13 @@
           },
           "value" : {
             "type" : "object",
-            "additionalProperties" : { }
+            "additionalProperties" : true
           }
         }
       },
       "Page" : {
         "required" : [ "id", "layout", "meta", "subpages" ],
+        "type" : "object",
         "properties" : {
           "id" : {
             "type" : "integer",
@@ -314,56 +1465,66 @@
         }
       },
       "MetaPage" : {
+        "type" : "object",
         "properties" : {
           "domain" : {
             "type" : "string",
-            "example" : "mateuszteplicki.myportfolio.com"
+            "example" : "jankowalski.myportfolio.com"
           },
           "name" : {
             "type" : "string",
-            "example" : "mateusz teplicki fotografia"
+            "example" : "Jan Kowalski fotografia"
           },
           "author" : {
             "type" : "string",
-            "example" : "mateusz teplicki"
-          }
-        }
-      },
-      "Layout" : {
-        "required" : [ "id" ],
-        "properties" : {
-          "id" : {
-            "type" : "integer",
-            "format" : "int64",
-            "example" : 1
-          },
-          "is_template" : {
-            "type" : "boolean",
-            "example" : false
-          },
-          "author" : {
-            "type" : "string"
-          },
-          "alias" : {
-            "type" : "string"
-          },
-          "font" : {
-            "type" : "string"
-          },
-          "nav_bar" : {
-            "type" : "string",
-            "enum" : [ "left", "top", "right" ]
+            "example" : "Jan Kowalski"
           },
           "logo" : {
             "$ref" : "#/components/schemas/Image"
           },
-          "background_color" : {
+          "languages" : {
+            "type" : "array",
+            "example" : [ "PL", "EN", "FR" ],
+            "items" : {
+              "type" : "string"
+            }
+          }
+        },
+        "additionalProperties" : true
+      },
+      "MetaLayout" : {
+        "required" : [ "alias", "value" ],
+        "type" : "object",
+        "properties" : {
+          "alias" : {
             "type" : "string"
+          },
+          "value" : {
+            "$ref" : "#/components/schemas/MetaLayout_value"
           }
         }
       },
+      "Layout" : {
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/MetaLayout"
+        }, {
+          "required" : [ "id", "is_template" ],
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "type" : "integer",
+              "format" : "int64",
+              "example" : 1
+            },
+            "is_template" : {
+              "type" : "boolean",
+              "example" : false
+            }
+          }
+        } ]
+      },
       "Image" : {
-        "required" : [ "id" ],
+        "required" : [ "alt", "id", "image", "page", "title" ],
         "properties" : {
           "id" : {
             "type" : "integer",
@@ -376,13 +1537,60 @@
             "example" : 2
           },
           "image" : {
-            "type" : "string"
+            "type" : "string",
+            "example" : "https://i.ibb.co/R3JhM0J/Group-1-min.jpg"
           },
           "alt" : {
-            "type" : "string"
+            "type" : "string",
+            "example" : "Alternative text"
           },
           "title" : {
-            "type" : "string"
+            "type" : "string",
+            "example" : "Title of image"
+          }
+        }
+      },
+      "subpage_body" : {
+        "required" : [ "meta", "value" ],
+        "type" : "object",
+        "properties" : {
+          "value" : {
+            "type" : "object",
+            "additionalProperties" : true,
+            "description" : "additional properties of subpage"
+          },
+          "meta" : {
+            "$ref" : "#/components/requestBodies/MetaSubpage"
+          }
+        }
+      },
+      "subpage_id_body" : {
+        "required" : [ "meta", "value" ],
+        "type" : "object",
+        "properties" : {
+          "value" : {
+            "type" : "object",
+            "additionalProperties" : true,
+            "description" : "addtional value of subpage"
+          },
+          "meta" : {
+            "$ref" : "#/components/requestBodies/MetaSubpage"
+          }
+        }
+      },
+      "id_subpage_section_body" : {
+        "required" : [ "alias", "value" ],
+        "type" : "object",
+        "properties" : {
+          "alias" : {
+            "type" : "string",
+            "description" : "alias of a section",
+            "example" : "gallery-section"
+          },
+          "value" : {
+            "type" : "object",
+            "additionalProperties" : true,
+            "description" : "value of a section"
           }
         }
       },
@@ -392,37 +1600,27 @@
           "file" : {
             "type" : "string",
             "format" : "binary"
-          },
-          "page_id" : {
-            "type" : "integer",
-            "format" : "int64",
-            "example" : 1
           }
         }
       },
-      "Section_value" : {
+      "MetaLayout_value" : {
         "type" : "object",
         "properties" : {
-          "images" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/Image"
-            }
+          "author" : {
+            "type" : "string"
+          },
+          "font" : {
+            "type" : "string"
+          },
+          "nav_bar" : {
+            "type" : "string",
+            "enum" : [ "left", "top", "right" ]
+          },
+          "background_color" : {
+            "type" : "string"
           }
         },
-        "example" : "{\"images\":[{\"id\":1,\"page\":2,\"image\":\"https://i.ibb.co/R3JhM0J/Group-1-min.jpg\",\"alt\":\"Alternative text\",\"title\":\"Title of image\"},{\"id\":2,\"page\":2,\"image\":\"https://i.ibb.co/VDnKX0R/Group-3-min.jpg\",\"alt\":\"Title of image\",\"title\":\"Title of image\"}]}"
-      },
-      "Subpage_value" : {
-        "required" : [ "sections" ],
-        "type" : "object",
-        "properties" : {
-          "sections" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/Section"
-            }
-          }
-        }
+        "additionalProperties" : true
       }
     },
     "requestBodies" : {
@@ -441,40 +1639,57 @@
           }
         }
       },
-      "Pet" : {
-        "description" : "Pet object that needs to be added to the store",
+      "MetaPage" : {
+        "description" : "Meta information of page",
         "content" : {
           "application/json" : {
             "schema" : {
-              "$ref" : "#/components/schemas/Section"
-            }
-          },
-          "application/xml" : {
-            "schema" : {
-              "$ref" : "#/components/schemas/Section"
+              "$ref" : "#/components/schemas/MetaPage"
             }
           }
         },
         "required" : true
       },
-      "UserArray" : {
-        "description" : "List of user object",
+      "MetaSubpage" : {
+        "description" : "Meta information of subpage",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/MetaSubpage"
+            }
+          }
+        },
+        "required" : true
+      },
+      "Order" : {
+        "description" : "Order of elements in container",
         "content" : {
           "application/json" : {
             "schema" : {
               "type" : "array",
               "items" : {
-                "$ref" : "#/components/schemas/Section"
+                "type" : "integer"
               }
-            }
+            },
+            "example" : [ 2, 1, 4, 3 ]
           }
         },
         "required" : true
+      },
+      "MetaLayout" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/MetaLayout"
+            }
+          }
+        }
       }
     },
     "securitySchemes" : {
       "bearerAuth" : {
         "type" : "http",
+        "description" : "payload zawiera pole \"id\", które determinuje, która strona jest modyfikowana przy zapytaniach RESTowych",
         "scheme" : "bearer",
         "bearerFormat" : "JWT"
       }
